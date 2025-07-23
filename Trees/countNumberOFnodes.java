@@ -21,4 +21,25 @@ public int countLeafNodes(TreeNode root) {
     }
     return countLeafNodes(root.left) + countLeafNodes(root.right);
 }
+
+public static void main(String[] args) {
+    // Example usage:
+    // Construct a sample tree:
+    //      1
+    //     / \
+    //    2   3
+    //   / \
+    //  4   5
+
+    TreeNode root = new TreeNode(1);
+    root.left = new TreeNode(2);
+    root.right = new TreeNode(3);
+    root.left.left = new TreeNode(4);
+    root.left.right = new TreeNode(5);
+
+    countNumberOFnodes counter = new countNumberOFnodes();
+    System.out.println("Total nodes: " + counter.countNodes(root));
+    System.out.println("Internal nodes: " + counter.countInternalNodes(root));
+    System.out.println("Leaf nodes: " + counter.countLeafNodes(root));
+}
 }
