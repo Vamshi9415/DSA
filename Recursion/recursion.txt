@@ -1,0 +1,13 @@
+Recursion is nothing but when function calls itself until a specified condition is met
+
+Stack overflow occurs when there is numerous function calls waiting
+
+stack overflow happens when a program uses more stack memory than the system allows
+because too much memory is allocated on the stack usually beacause toop deep or infinite Recursion
+
+like every program has two main memory areas
+
+stack used for fucntion calls / local variables, parameters/ return addresses
+it grows and shrinks automatiacally as fucntionsare called and return
+
+heap used for dynamic memory 
