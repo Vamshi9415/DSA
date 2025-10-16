@@ -1,3 +1,4 @@
+// this code works for only sorted arrays
 import java.util.*;
 public class unionoftwoarrays {
     static List<Integer> union(int[] arr1,int[] arr2){
