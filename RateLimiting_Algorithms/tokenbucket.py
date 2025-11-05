@@ -1,7 +1,7 @@
 import asyncio
 import time
 MAX_TOKENS = 5
-REFILL_RATE = 5
+REFILL_RATE = 1
 
 class TokenBucket :
     def __init__(self,max_tokens,refill_rate):
@@ -11,9 +11,10 @@ class TokenBucket :
     
     def has_tokens(self):
         ''' check if tokens are available'''
-        self.tokens > 0
+        return self.tokens > 0
     
     def consume_token(self):
+        """Consume a token if available"""
         if self.has_tokens():
             self.tokens -=1
             
@@ -25,6 +26,8 @@ class TokenBucket :
         '''refill tokens if bucket not full'''
         if self.tokens < self.max_tokens:
             self.tokens +=1
+            return True
+        return False
 
 bucket = TokenBucket(MAX_TOKENS,REFILL_RATE)
 
@@ -37,7 +40,7 @@ async def handle_incoming_request(request_id):
     
     print(f"Processing Request {request_id}")
     
-    asyncio.sleep(2)
+    await asyncio.sleep(2)
     
     print(f"Done Request {request_id}")
 
@@ -46,7 +49,19 @@ async def refill_tokens():
     
     while True :
         await asyncio.sleep(bucket.refill_rate)
-        bucket.release_token()
-        
+        if bucket.release_token():
+            print(f"Token Refilled (Total: {bucket.tokens}/{bucket.max_tokens})")
+
+async def main():
+    asyncio.create_task(refill_tokens())
+    
+    for i in range(12):
+        asyncio.create_task(handle_incoming_request(i))
+        await asyncio.sleep(0.5)
+    
+    # Wait for all tasks to complete
+    await asyncio.sleep(10)
+
+asyncio.run(main())       
     
         
