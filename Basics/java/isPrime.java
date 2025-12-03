@@ -1,4 +1,3 @@
-
 public class isPrime {
     public static boolean isaPrime(int number){
 
@@ -14,6 +13,7 @@ public class isPrime {
 
         return true;
     }
+
     public static void main(String[] args) {
         int num = 29; 
         if (isaPrime(num)) {
