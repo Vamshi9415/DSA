@@ -115,13 +115,3 @@ Multiple tasks running simultaneously on multiple CPU cores.
 * **Concurrency** → overlapping execution
 * **Parallelism** → same-time execution
 
----
-
-If you want, I can:
-
-* turn this into **perfect exam answer**
-* give **Python code examples**
-* explain **GIL impact**
-* draw **simple diagram explanation**
-
-Just say 👍

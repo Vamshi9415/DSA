@@ -1,0 +1,53 @@
+import java.util.*;
+
+class Node {
+    int val;
+    Node left, right;
+
+    Node(int val) {
+        this.val = val;
+        this.left = null;
+        this.right = null;
+    }
+}
+
+public class BinaryTreeBuilder {
+
+    public static Node createTree(ArrayList<Integer> vec) {
+        if (vec == null || vec.isEmpty()) return null;
+        return buildTree(vec, 0);
+    }
+
+    private static Node buildTree(ArrayList<Integer> vec, int i) {
+        if (i >= vec.size()) return null;
+
+        Node root = new Node(vec.get(i));
+        root.left = buildTree(vec, 2 * i + 1);
+        root.right = buildTree(vec, 2 * i + 2);
+
+        return root;
+    }
+
+    // Print the tree in level order (BFS)
+    public static void printLevelOrder(Node root) {
+        if (root == null) return;
+        Queue<Node> q = new LinkedList<>();
+        q.add(root);
+
+        while (!q.isEmpty()) {
+            Node curr = q.poll();
+            System.out.print(curr.val + " ");
+            if (curr.left != null) q.add(curr.left);
+            if (curr.right != null) q.add(curr.right);
+        }
+    }
+
+    // Main method to test
+    public static void main(String[] args) {
+        ArrayList<Integer> vec = new ArrayList<>(Arrays.asList(1, 2, 3, 4, 5, 6, 7));
+        Node root = createTree(vec);
+
+        System.out.println("Level-order traversal of the constructed tree:");
+        printLevelOrder(root);
+    }
+}
