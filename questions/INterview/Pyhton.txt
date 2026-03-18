@@ -1,0 +1,113 @@
+What is the difference between list, tuple, and set?
+
+List: An ordered, mutable collection. Use it when you need a sequence that changes.
+Tuple: An ordered, immutable collection. It is faster than a list and can be used as a dictionary key.Set: An unordered collection of unique elements. It uses a hash table, making lookups $O(1)$ on average.
+
+What is the difference between deepcopy and shallow copy?
+Shallow Copy vs. Deep Copy (You had these reversed!)
+Shallow Copy: Creates a new object, but fills it with references to the child objects of the original. If you modify a nested list in a shallow copy, the original will change.
+
+Deep Copy: Creates a new object and recursively copies every object found in the original. The two objects are entirely independent.
+
+What are Python decorators?
+Decorators are the python fucntions that doesnt change the inner implementtaion  of the method but it adds extra fucntionality tothe fuicntio s like if method deosmt have any debugging statements usinf decoreator we can add to that method withput changing the implementatin of that method
+
+A decorator is a higher-order function that takes another function as an argument, extends its behavior without explicitly modifying its source code, and returns a new function.
+
+What are generators and why are they memory efficient?
+
+"A generator is a special type of function in Python that returns an iterator object. Instead of using return to send back a single value and destroy the function's local state, a generator uses the yield keyword. yield pauses the function's execution, saves all its local variables and state, and returns a value to the caller. When the generator is called again, it resumes exactly where it left off."
+
+Why are they memory efficient? (The "Lazy Evaluation" Concept)
+"Generators are highly memory efficient because they use lazy evaluation. Instead of computing an entire sequence of data and loading it all into memory at once (like a List does), a generator computes and yields only one item at a time."
+
+What is the difference between iterables and iterators?
+Iterable: Any object you can loop over (like a List or String). It has an __iter__() method that returns an iterator.
+
+Iterator: The object that actually does the work. It has a __next__() method that fetches the next element and raises StopIteration when done.
+
+How does Python garbage collection work?
+
+Python manages memory automatically through two primary mechanisms that work together: Reference Counting and Generational Garbage Collection. 
+
+1. Reference Counting (Main Strategy)
+This is Python's "first line of defense." Every object created keeps a count of how many other variables or objects refer to it. 
+
+Increase: When an object is assigned to a new name, added to a list, or passed to a function.
+Decrease: When a reference is deleted (del), goes out of scope, or is reassigned.
+Deallocation: As soon as an object's reference count drops to zero, Python immediately reclaims its memory. 
+
+2. Generational Garbage Collection (The Cleanup Crew)
+Reference counting has one major weakness: it cannot detect cyclic references (e.g., Object A points to B, and B points back to A). Even if your code stops using them, their counts never hit zero. 
+
+To fix this, Python’s cyclic garbage collector uses a Generational approach: 
+
+Three Generations: Objects are sorted into three lists (Generations 0, 1, and 2) based on how long they've lived.
+Promotion: New objects start in Generation 0. If they survive a garbage collection cycle, they are "promoted" to an older generation.
+Frequency: The collector checks newer objects (Gen 0) much more frequently than old timers (Gen 2). This follows the "Weak Generational Hypothesis"—the idea that most objects die young.
+Thresholds: Collection is triggered automatically when the number of allocations minus deallocations exceeds a certain threshold (default is 700 for Gen 0). 
+
+How to Interact with GC
+While usually automatic, you can control this process using the gc module: 
+gc.collect(): Manually triggers a collection.
+gc.disable(): Turns off the automatic collector (useful in very high-performance scenarios).
+gc.get_threshold(): Views the current triggers for each generation.
+
+What is the Global Interpreter Lock (GIL)?
+The GIL is a mutex that allows only one thread to execute Python bytecode at a time. This is necessary because Python’s memory management isn't thread-safe.
+
+When should you use threading vs multiprocessing?
+In a nutshell, choose Threading for I/O-bound tasks like web scraping or API calls where the program spends most of its time waiting for a response, as it is lightweight and shares memory efficiently. However, because of Python's Global Interpreter Lock (GIL), threading cannot run code on multiple CPU cores simultaneously. For CPU-bound tasks like data crunching or image processing, use Multiprocessing; it bypasses the GIL by creating entirely separate memory spaces and instances of the Python interpreter, allowing your code to achieve true parallelism across all available processor cores.
+
+What is asyncio?
+Asyncio is a library used to write concurrent code using the async/export syntax. It uses an Event Loop as a central scheduler to manage Coroutines, which are special functions that can voluntarily suspend (yield) and resume their execution. This allows a single thread to handle thousands of tasks (like network requests) simultaneously by switching to a new task whenever the current one is waiting for a resource, rather than sitting idle
+
+What is the difference between async and await?
+The async keyword is a modifier placed before a function definition (async def) to transform it into a Coroutine, ensuring that calling it returns a coroutine object instead of executing the code immediately. The await keyword can only be used inside an async function; it tells the Event Loop to pause the current coroutine’s execution until the awaited task is finished, allowing other tasks to run in the meantime without blocking the entire thread. 
+
+
+What are Python context managers?
+python context manager are like with thjat deosnt need a exit or closing the process, it automatically cl;oses
+
+Context Managers are objects that simplify resource management (like opening files or database connections) by ensuring that setup and cleanup code is executed automatically. They are typically used with the with statement, which triggers the __enter__ method to start the process and the __exit__ method to safely close the resource or handle errors, even if the code inside the block crashes. 
+
+What is the difference between __str__ and __repr__?
+Both of these are dunder methods used to convert your object into a string. The difference comes down to who the string is meant for.
+import datetime
+
+# We create a simple date object
+today = datetime.date(2026, 3, 17)
+
+# ---------------------------------------------------------
+# 1. __str__ (The "Pretty" version)
+# Triggered when you use str() or print()
+# ---------------------------------------------------------
+print(str(today)) 
+# Output: '2026-03-17'
+# Why? Because a regular user just wants to see the date formatted nicely.
+
+# ---------------------------------------------------------
+# 2. __repr__ (The "Technical" version)
+# Triggered when you use repr() or inspect the object in the terminal
+# ---------------------------------------------------------
+print(repr(today)) 
+# Output: 'datetime.date(2026, 3, 17)'
+# Why? Because a developer needs to know exactly what class this is. 
+# Notice how the output is the EXACT valid Python code needed to recreate the object.
+
+
+__str__ is for the User: It should be readable, pretty, and informative. It gets triggered automatically when you call print(my_object) or str(my_object).
+
+__repr__ is for the Developer: It stands for "representation." It should be detailed, unambiguous, and used for debugging. Ideally, it should output a string that looks exactly like the valid Python code needed to recreate that object. It gets triggered when you inspect an object in the console or use repr(my_object).
+
+What are Python dunder methods?
+"Dunder" is just short for Double Underscore. They are the methods that have two underscores before and after their name, like __init__ or __len__.
+
+The Interview Answer:
+"Dunder methods—also known as Magic Methods—are special hooks that allow custom objects to interact with Python's built-in syntax. They let your classes behave like standard Python data types."
+
+The "Why it matters" Example:
+If you want to find the length of your custom object, you don't have to invent a new method like my_object.get_length(). Instead, you define the __len__() dunder method inside your class. Then, anyone using your code can just use the standard, built-in Python function: len(my_object). It makes your code "Pythonic."
+
+What happens internally when you create a Python object?
+When you instantiate a class, Python first calls __new__ to physically allocate memory for the object on the Heap, and then it calls __init__ to initialize the object's attributes. The object's data (attributes and methods) stays on the Heap, while the variable name (the pointer) is stored on the Stack, holding the memory address that links back to the actual object on the Heap.
