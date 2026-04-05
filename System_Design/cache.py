@@ -51,6 +51,9 @@ class Cache:
                 self.misses += 1
                 return None
 
+            # ✅ Sliding expiration: reset expiry on access
+            entry.expiry = time.time() + self.ttl
+            
             self.hits +=1
             # when we get the key move that to last position means that is least recently used 
             self.dict_cache.move_to_end(key) # inserting at last which is most recently used
@@ -100,7 +103,31 @@ class Cache:
             
             self.dict_cache.clear()
             return count
-        
-    
-    
-    
+
+
+if __name__ == "__main__":
+    # Small TTL and size to quickly demonstrate expiry and LRU eviction.
+    cache = Cache(max_entries=3, ttl=2)
+
+    print("Adding entries: a=1, b=2, c=3")
+    cache.put("a", 1)
+    cache.put("b", 2)
+    cache.put("c", 3)
+    print("Current keys:", list(cache.dict_cache.keys()))
+
+    print("\nAccessing 'a' to make it most recently used")
+    print("get('a') ->", cache.get("a"))
+    print("Current keys:", list(cache.dict_cache.keys()))
+
+    print("\nAdding d=4 (should evict least recently used key)")
+    cache.put("d", 4)
+    print("Current keys:", list(cache.dict_cache.keys()))
+
+    print("\nWaiting for TTL expiry...")
+    time.sleep(3)
+    print("get('a') after expiry ->", cache.get("a"))
+    print("get('d') after expiry ->", cache.get("d"))
+
+    print("\nCache stats:", cache.cache_stats())
+    removed = cache.clear()
+    print("Cleared entries:", removed)
