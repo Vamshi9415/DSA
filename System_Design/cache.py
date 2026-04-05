@@ -16,7 +16,7 @@
 # RIGHT	Most Recently Used
 from collections import OrderedDict
 import time
-from threading import Lock 
+from threading import Event, Lock, Thread
 
 class CacheEntry:
     def __init__(self,value,expiry):
@@ -25,15 +25,22 @@ class CacheEntry:
         
     
 class Cache:
-    def __init__(self,max_entries=5, ttl = 100):
+    def __init__(self,max_entries=5, ttl = 100, cleanup_interval=5, start_cleaner=True):
         # this is to store the elements in order, ordereddcit used bea=cause to rearrange elements 
         self.dict_cache = OrderedDict()
         self.max_entries = max_entries
         self.ttl = ttl
+        self.cleanup_interval = cleanup_interval
         #these are stats
         self.hits = 0
         self.misses = 0
         self.lock = Lock()
+        self._stop_event = Event()
+        self._cleaner_thread = None
+
+        if start_cleaner:
+            self._cleaner_thread = Thread(target=self._cleanup_worker, daemon=True)
+            self._cleaner_thread.start()
         
     
     def get(self, key):
@@ -55,13 +62,12 @@ class Cache:
             entry.expiry = time.time() + self.ttl
             
             self.hits +=1
-            # when we get the key move that to last position means that is least recently used 
+            # when we get the key move that to last position means that is most recently used 
             self.dict_cache.move_to_end(key) # inserting at last which is most recently used
             return entry.value
     
     def put(self,key,value):
         with self.lock:
-            self._evict_expired()
             # instead of storing key-> value
             # we store key ->(value,expiry_time) entries should expire after time
             expiry = time.time() + self.ttl #100 sec TTL
@@ -96,6 +102,16 @@ class Cache:
         
         for key in keys_to_delete :
             del self.dict_cache[key]
+
+    def _cleanup_worker(self):
+        while not self._stop_event.wait(self.cleanup_interval):
+            with self.lock:
+                self._evict_expired()
+
+    def close(self):
+        self._stop_event.set()
+        if self._cleaner_thread is not None and self._cleaner_thread.is_alive():
+            self._cleaner_thread.join(timeout=1)
     
     def clear(self):
         with self.lock:
@@ -107,7 +123,7 @@ class Cache:
 
 if __name__ == "__main__":
     # Small TTL and size to quickly demonstrate expiry and LRU eviction.
-    cache = Cache(max_entries=3, ttl=2)
+    cache = Cache(max_entries=3, ttl=2, cleanup_interval=1)
 
     print("Adding entries: a=1, b=2, c=3")
     cache.put("a", 1)
@@ -131,3 +147,4 @@ if __name__ == "__main__":
     print("\nCache stats:", cache.cache_stats())
     removed = cache.clear()
     print("Cleared entries:", removed)
+    cache.close()
